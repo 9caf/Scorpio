@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'jingwei.liu@foxmail.com'
+__author__ = '106035405@qq.com'
 
 from flask import Flask, render_template, request, url_for
 app = Flask(__name__)
