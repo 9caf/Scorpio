@@ -1,2 +1,0 @@
-# Scorpio
-Personal Python Study
