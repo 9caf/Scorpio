@@ -66,12 +66,12 @@ def index():
 	try:
 		session = DBSession.DBSession()
 		query = session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()
-		app.logger.info('>>> session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()  查询成功！')
+		app.logger.info('>>> index()  查询成功！')
 		# 关闭Session:
 		session.close()
 		return render_template('index.html', result = query)
 	except Exception as e:
-		app.logger.error('>>> session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()  查询出错！')
+		app.logger.error('>>> index()  查询出错！')
 		raise e
 
 #查询全部信息		
@@ -79,13 +79,13 @@ def index():
 def findall():
 	try:
 		session = DBSession.DBSession()
-		query = session.query(DBSession.MinorPurchase).all()
-		app.logger.info('>>> session.query(DBSession.MinorPurchase).all()  查询成功！')
+		query = session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).all()
+		app.logger.info('>>> findall()  查询成功！')
 		# 关闭Session:
 		session.close()
 		return render_template('findall.html', result = query, num = len(query))
 	except Exception as e:
-		app.logger.error('>>> session.query(DBSession.MinorPurchase).all()  查询出错！')
+		app.logger.error('>>> findall()  查询出错！')
 		raise e
 
 @app.route('/dengji', methods=['GET', 'POST'])
