@@ -1,0 +1,16 @@
+<html>
+<body>
+	
+	<h1>Hello, this is what you find:</h1>
+
+	{% for id, item, remark, operator, create_time, modify_time in ap %}
+		<p>
+			零星采购编号：{{ id }}<br>
+			采购项目：{{ item }}<br>
+			经办人：{{ operator }}<br>
+			创建时间：{{ create_time|datetimeformat }}
+		</p>
+	{% endfor %}
+
+</body>
+</html>

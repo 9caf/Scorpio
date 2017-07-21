@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8"> 
+	<title>Scorpio 天蝎座计划</title>
+	<!-- 新 Bootstrap 核心 CSS 文件 -->
+	<link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<!-- 自定义style.css样式表 -->
+	<link href="{{ url_for('static',filename='style.css') }}" rel="stylesheet">
+	<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script> 
+	<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+	<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script>
+        $("#modal-829203").on("hidden.bs.modal", function(){
+		    $("#editinfo").modal("show");
+		})
+		
+		$("#modal-568910").on("hidden.bs.modal", function(){
+		    $("#myModalLabel").modal("show");
+		})
+    </script>
+</head>
+
+<body>
+	
+<div class="container">
+	<div class="row clearfix">
+		<div class="col-md-3 column">
+		</div>
+		<div class="col-md-6 column">
+			<div class="page-header">
+				<h1>
+					零星采购编号申请登记 <br>
+					<small>以下为所有采购信息</small>
+				</h1>
+			</div>
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th class="number">
+							编号
+						</th>
+						<th class="item">
+							项目
+						</th>
+						<th class="operator">
+							经办人
+						</th>
+						<th class="operate">
+							操作
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for id, item, remark, operator, create_time, modify_time in result %}
+					<tr>
+						<td>
+							{% set number = id + create_time|datetimeformat('%Y')|int * 10000 %}
+							{{ number }}
+						</td>
+						<td>
+							{{ item }}
+						</td>
+						<td>
+							{{ operator }}
+						</td>
+						<td>
+							<a id="modal-829203" href="#modal-container-829203" role="button" class="btn-link" data-toggle="modal" data-backdrop="static">查看详细</a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			
+			<ul class="pagination">
+				<li>
+					 <a href="#">Prev</a>
+				</li>
+				<li>
+					 <a href="#">1</a>
+				</li>
+				<li>
+					 <a href="#">3</a>
+				</li>
+				<li>
+					 <a href="#">3</a>
+				</li>
+				<li>
+					 <a href="#">4</a>
+				</li>
+				<li>
+					 <a href="#">5</a>
+				</li>
+				<li>
+					 <a href="#">Next</a>
+				</li>
+			</ul>
+			
+			<button type="button" class="btn btn-primary btn-block" onclick="javascript:history.back(-1);">返回刚才页面</button>
+
+			<div class="modal fade" id="modal-container-829203" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h3 class="modal-title" id="myModalLabel">
+								零星采购编号：
+								<span class="text-primary">20170103</span>
+							</h3>
+						</div>
+						<div class="modal-body">
+							<dl class="dl-horizontal">
+								<dt>
+									项目
+								</dt>
+								<dd>
+									茶叶采购
+								</dd>
+								<dt>
+									备注
+								</dt>
+								<dd>
+									11号线
+								</dd>
+								<dt>
+									创建时间
+								</dt>
+								<dd>
+									07/18/2017
+								</dd>
+								<dt>
+									经办人
+								</dt>
+								<dd>
+									admin
+								</dd>
+							</dl>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+							<a id="modal-568910" href="#modal-container-568910" role="button" class="btn btn-primary" data-toggle="modal" data-dismiss="modal" data-backdrop="static">编辑</a>
+						</div>	
+					</div>					
+				</div>				
+			</div>
+			<div class="modal fade" id="modal-container-568910" role="dialog" aria-labelledby="editinfo" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="editinfo">
+								标题
+							</h4>
+						</div>
+						<div class="modal-body">
+							<form role="form" method="post">
+								<div class="form-group">
+									 <label for="inputPjname">项目名称（必选）</label><input type="text" class="form-control" id="inputPjname" name="inputPjname" value="茶叶采购" />
+								</div>
+								<div class="form-group">
+									 <label for="inputPjmark">项目详细说明（可选）</label><textarea class="form-control" rows="5" id="inputPjmark" name="inputPjmark"/>11号线</textarea>
+								</div>							
+								<div class="modal-footer">
+									 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> 
+									 <a id="modal-829203" href="#modal-container-829203" role="button" class="btn btn-success" data-toggle="modal" data-dismiss="modal" data-backdrop="static">确认修改</a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				<div class="modal fade" id="modal-container-43560" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								标题
+							</h4>
+						</div>
+						<div class="modal-body">
+							内容...
+						</div>
+						<div class="modal-footer">
+							 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button> <button type="button" class="btn btn-primary">保存</button>
+						</div>
+						</div>
+					</div>
+				</div>							
+			</div>
+		</div>
+		<div class="col-md-3 column">
+		</div>
+	</div>
+</div>
+
+</body>
