@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+#自己diy了一个简单的适配器，已使用sqlalchemy ORM替代
+#
+#弃用！
+#
 import pymysql
 
 __author__ = '106035405@qq.com'

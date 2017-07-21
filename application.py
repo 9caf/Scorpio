@@ -3,7 +3,7 @@
 __author__ = '106035405@qq.com'
 
 from flask import Flask, render_template, request, url_for
-import pymysql, datetime, dbmodules
+import datetime, DBSession
 
 app = Flask(__name__)
 
@@ -48,28 +48,44 @@ app.jinja_env.filters['datetimeformat'] = datetimeformat
 # 		app.logger.info('查询成功：' + sql)
 # 	return render_template('index.html', result = result)
 
+# #已成功使用pymysql制作的modules操作数据库
+# @app.route('/index')
+# def index():
+# 	try:
+# 		sql = 'SELECT * FROM `t_minor_purchase` ORDER BY id DESC LIMIT %d' % page + ', %d' % ()
+# 		template = 'index.html'
+# 		result = dbmodules.queryall(sql, template)
+# 		app.logger.info('查询成功！SQL: %s，' % sql + 'template: %s' % template)
+# 		return render_template(template, result = result)
+# 	except Exception as e:
+# 		app.logger.error('查询出错！SQL: %s，' % sql + 'template: %s' % template)
+# 		raise e
+
 @app.route('/index')
 def index():
 	try:
-		sql = 'SELECT * FROM `t_minor_purchase` ORDER BY id DESC LIMIT 10'
-		template = 'index.html'
-		result = dbmodules.queryall(sql, template)
-		app.logger.info('查询成功！SQL: %s，' % sql + 'template: %s' % template)
-		return render_template(template, result = result)
+		session = DBSession.DBSession()
+		query = session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()
+		app.logger.info('>>> session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()  查询成功！')
+		# 关闭Session:
+		session.close()
+		return render_template('index.html', result = query)
 	except Exception as e:
-		app.logger.error('查询出错！SQL: %s，' % sql + 'template: %s' % template)
+		app.logger.error('>>> session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()  查询出错！')
 		raise e
-		
+
+#查询全部信息		
 @app.route('/findall')
 def findall():
 	try:
-		sql = 'SELECT * FROM `t_minor_purchase` ORDER BY id DESC'
-		template = 'findall.html'
-		result = dbmodules.queryall(sql, template)
-		app.logger.info('查询成功！SQL: %s，' % sql + 'template: %s' % template)
-		return render_template(template, result = result)
+		session = DBSession.DBSession()
+		query = session.query(DBSession.MinorPurchase).all()
+		app.logger.info('>>> session.query(DBSession.MinorPurchase).all()  查询成功！')
+		# 关闭Session:
+		session.close()
+		return render_template('findall.html', result = query, num = len(query))
 	except Exception as e:
-		app.logger.error('查询出错！SQL: %s，' % sql + 'template: %s' % template)
+		app.logger.error('>>> session.query(DBSession.MinorPurchase).all()  查询出错！')
 		raise e
 
 @app.route('/dengji', methods=['GET', 'POST'])

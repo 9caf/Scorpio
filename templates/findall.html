@@ -26,15 +26,17 @@
 	
 <div class="container">
 	<div class="row clearfix">
-		<div class="col-md-3 column">
-		</div>
-		<div class="col-md-6 column">
+		<div class="col-md-12 column">
 			<div class="page-header">
 				<h1>
 					零星采购编号申请登记 <br>
-					<small>以下为所有采购信息</small>
+					<small>已查询到{{ num }}条有效信息，概况如下：</small>
 				</h1>
 			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-md-10 column">
 			<table class="table table-hover table-striped">
 				<thead>
 					<tr>
@@ -53,17 +55,17 @@
 					</tr>
 				</thead>
 				<tbody>
-					{% for id, item, remark, operator, create_time, modify_time in result %}
+					{% for obj in result %}
 					<tr>
 						<td>
-							{% set number = id + create_time|datetimeformat('%Y')|int * 10000 %}
+							{% set number = obj.id + obj.create_time|datetimeformat('%Y')|int * 10000 %}
 							{{ number }}
 						</td>
 						<td>
-							{{ item }}
+							{{ obj.item }}
 						</td>
 						<td>
-							{{ operator }}
+							{{ obj.operator }}
 						</td>
 						<td>
 							<a id="modal-829203" href="#modal-container-829203" role="button" class="btn-link" data-toggle="modal" data-backdrop="static">查看详细</a>
@@ -72,32 +74,6 @@
 					{% endfor %}
 				</tbody>
 			</table>
-			
-			<ul class="pagination">
-				<li>
-					 <a href="#">Prev</a>
-				</li>
-				<li>
-					 <a href="#">1</a>
-				</li>
-				<li>
-					 <a href="#">3</a>
-				</li>
-				<li>
-					 <a href="#">3</a>
-				</li>
-				<li>
-					 <a href="#">4</a>
-				</li>
-				<li>
-					 <a href="#">5</a>
-				</li>
-				<li>
-					 <a href="#">Next</a>
-				</li>
-			</ul>
-			
-			<button type="button" class="btn btn-primary btn-block" onclick="javascript:history.back(-1);">返回刚才页面</button>
 
 			<div class="modal fade" id="modal-container-829203" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 				<div class="modal-dialog">
@@ -189,7 +165,9 @@
 				</div>							
 			</div>
 		</div>
-		<div class="col-md-3 column">
+		<div class="col-md-2 column">
+			<button type="button" class="btn btn-default btn-block" onclick="javascript:history.back(-1);">导出Excel表格</button>
+			<button type="button" class="btn btn-primary btn-block" onclick="javascript:history.back(-1);">返回刚才页面</button>
 		</div>
 	</div>
 </div>
