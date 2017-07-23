@@ -3,89 +3,81 @@
 __author__ = '106035405@qq.com'
 
 from flask import Flask, render_template, request, url_for
-import datetime, DBSession
+from flask_sqlalchemy import SQLAlchemy
+import DBSession, pymysql
 
 app = Flask(__name__)
 
+#加载flask-sqlalchemy配置
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/testdb?charset=utf8'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+app.logger.debug(db)
+
+class MinorPurchase(db.Model):
+    # 表的名字:
+    __tablename__ = 't_minor_purchase'
+
+    # 表的结构:
+    id = db.Column(db.Integer, db.Sequence('minorPurchase_id_seq'), primary_key=True)
+    item = db.Column(db.String)
+    remark = db.Column(db.String)
+    operator = db.Column(db.String)
+    create_time = db.Column(db.DateTime)
+    modify_time = db.Column(db.DateTime)
+
+    def __init__(self, id, item, remark, operator, create_time, modify_time):
+    	self.id = id
+    	self.item = item
+    	self.remark = remark
+    	self.operator = operator
+    	self.create_time = create_time
+    	self.modify_time = modify_time
+
+    def __repr__(self):
+        return '<MinorPurchase %r>' % self.item
+
+#自定义jinja2的日期格式化过滤器
 def datetimeformat(value, format='%Y年%m月%d日'):
 	return value.strftime(format)
-
 app.jinja_env.filters['datetimeformat'] = datetimeformat
 
-##暂时保留‘/’根目录路由，日后改为用户登陆
-# @app.route('/')
-# def function0():
-# #	for row in result:
-# #		id = row[0]
-# #		pjname = row[1]
-# #		pjmark = row[2]
-# #		print('id : %s ' % id + ', 项目: %s ' % pjname + ', 说明： %s' % pjmark )
-# 	db = pymysql.connect(host="localhost", user="root", passwd="root", db="testdb", charset="utf8mb4")
-# 	cursor = db.cursor()
-# 	cursor.execute("INSERT INTO t_lingxing(pjname, pjmark) VALUES ('手机', '徐超')")
-# 	#result = cursor.fetchall()
-# 	db.commit()
-# 	db.close()
-
-# 	print('Do insert()')
-# 	return 'OK'
-
-##已成功查询最新10条数据
-# @app.route('/index')
-# def function1():
-# 	db = pymysql.connect(host="localhost", user="root", passwd="root", db="testdb", charset="utf8mb4")
-# 	cursor = db.cursor()
-# 	try:
-# 		sql = 'SELECT * FROM `t_minor_purchase` ORDER BY id DESC LIMIT 10'
-# 		cursor.execute(sql)
-# 		result = cursor.fetchall()
-# 		db.commit()
-# 		db.close()
-# 	except Exception as e:
-# 		app.logger.error('捕捉异常，查询出错！')
-# 		raise
-# 	finally:
-# 		app.logger.info('查询成功：' + sql)
-# 	return render_template('index.html', result = result)
-
-# #已成功使用pymysql制作的modules操作数据库
-# @app.route('/index')
-# def index():
-# 	try:
-# 		sql = 'SELECT * FROM `t_minor_purchase` ORDER BY id DESC LIMIT %d' % page + ', %d' % ()
-# 		template = 'index.html'
-# 		result = dbmodules.queryall(sql, template)
-# 		app.logger.info('查询成功！SQL: %s，' % sql + 'template: %s' % template)
-# 		return render_template(template, result = result)
-# 	except Exception as e:
-# 		app.logger.error('查询出错！SQL: %s，' % sql + 'template: %s' % template)
-# 		raise e
-
+#登入第一个页面
 @app.route('/index')
 def index():
+	__name__ = '登入查询第一个页面'
 	try:
-		session = DBSession.DBSession()
-		query = session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).limit(10).all()
-		app.logger.info('>>> index()  查询成功！')
-		# 关闭Session:
-		session.close()
-		return render_template('index.html', result = query)
+		page = request.args.get('page', 1, type = int)
+		app.logger.debug(__name__ + '参数page = %d' % page)
+
+		pagination = MinorPurchase.query.order_by(MinorPurchase.id.desc()).paginate(
+			page, per_page=10, error_out=True
+			)
+		print(pagination.has_next)
+		print(pagination.has_prev)
+		print(pagination.iter_pages)
+		print(pagination.next_num)
+
+		query = pagination.items
+		app.logger.info(__name__ + '>>> index()  查询成功！')
+		return render_template('index.html', result = query, pagination = pagination)
+	except TypeError as e:
+		app.logger.error(__name__ + '运行类型错误  查询出错！')
+		raise e
 	except Exception as e:
-		app.logger.error('>>> index()  查询出错！')
+		app.logger.error(__name__ + '>>> index()  查询出错！')
 		raise e
 
 #查询全部信息		
 @app.route('/findall')
 def findall():
+	__name__ = '查询全部信息页面'
 	try:
-		session = DBSession.DBSession()
-		query = session.query(DBSession.MinorPurchase).order_by(DBSession.MinorPurchase.id.desc()).all()
-		app.logger.info('>>> findall()  查询成功！')
-		# 关闭Session:
-		session.close()
+		query = MinorPurchase.query.order_by(MinorPurchase.id.desc()).all()
+		app.logger.info(__name__ + '>>> findall()  查询成功！')
 		return render_template('findall.html', result = query, num = len(query))
 	except Exception as e:
-		app.logger.error('>>> findall()  查询出错！')
+		app.logger.error(__name__ + '>>> findall()  查询出错！')
 		raise e
 
 @app.route('/dengji', methods=['GET', 'POST'])
