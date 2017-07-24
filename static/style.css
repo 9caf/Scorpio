@@ -1,15 +1,19 @@
+.seq {
+	width: 5%
+}
+
 .number {
-	width: 20%
+	width: 15%
 }
 
 .item {
-	width: 44%
+	width: 50%
 }
 
 .operator {
-	width: 18%
+	width: 15%
 }
 
 .operate {
-	width: 18%
+	width: 15%
 }

@@ -4,8 +4,10 @@ __author__ = '106035405@qq.com'
 
 from flask import Flask, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
-import DBSession, pymysql
+from flask_json import FlaskJSON, as_json
+import pymysql, json
 
+#加载flask框架
 app = Flask(__name__)
 
 #加载flask-sqlalchemy配置
@@ -14,6 +16,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.logger.debug(db)
 
+#加载flask-json配置
+FlaskJSON(app)
+app.config['JSON_ADD_STATUS'] = False
+app.config['JSON_DATETIME_FORMAT'] = '%Y年%m月%d日'
+
+#定义零星采购的信息属性Model
 class MinorPurchase(db.Model):
     # 表的名字:
     __tablename__ = 't_minor_purchase'
@@ -34,8 +42,8 @@ class MinorPurchase(db.Model):
     	self.create_time = create_time
     	self.modify_time = modify_time
 
-    def __repr__(self):
-        return '<MinorPurchase %r>' % self.item
+    def to_dict(self):
+    	return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
 
 #自定义jinja2的日期格式化过滤器
 def datetimeformat(value, format='%Y年%m月%d日'):
@@ -48,16 +56,9 @@ def index():
 	__name__ = '登入查询第一个页面'
 	try:
 		page = request.args.get('page', 1, type = int)
-		app.logger.debug(__name__ + '参数page = %d' % page)
-
 		pagination = MinorPurchase.query.order_by(MinorPurchase.id.desc()).paginate(
 			page, per_page=10, error_out=True
 			)
-		print(pagination.has_next)
-		print(pagination.has_prev)
-		print(pagination.iter_pages)
-		print(pagination.next_num)
-
 		query = pagination.items
 		app.logger.info(__name__ + '>>> index()  查询成功！')
 		return render_template('index.html', result = query, pagination = pagination)
@@ -68,18 +69,6 @@ def index():
 		app.logger.error(__name__ + '>>> index()  查询出错！')
 		raise e
 
-#查询全部信息		
-@app.route('/findall')
-def findall():
-	__name__ = '查询全部信息页面'
-	try:
-		query = MinorPurchase.query.order_by(MinorPurchase.id.desc()).all()
-		app.logger.info(__name__ + '>>> findall()  查询成功！')
-		return render_template('findall.html', result = query, num = len(query))
-	except Exception as e:
-		app.logger.error(__name__ + '>>> findall()  查询出错！')
-		raise e
-
 @app.route('/dengji', methods=['GET', 'POST'])
 def dengji():
 	if request.method == 'POST':
@@ -87,16 +76,25 @@ def dengji():
 	else:
 		return render_template('dengji.html')
 
-@app.route('/details')
-def details():
-	return render_template('details.html')
-	
 @app.errorhandler(404)
 def not_found(error):
     return render_template('error.html'), 404
 
-def datetimeformat(value, format='%H:%M / %d-%m-%Y'):
-    return value.strftime(format)
+#查询当前采购信息详情
+@app.route('/query/<int:id>', methods=['GET', 'POST'])
+@as_json
+def query_here(id):
+	__name__ = '查询当前采购信息详情'
+	if request.method == 'POST':
+		pass
+	else:
+		try:
+			query = MinorPurchase.query.filter_by(id = id).first_or_404()
+			app.logger.info(__name__ + '>>> query_here()  查询成功！')
+			return query.to_dict()
+		except Exception as e:
+			app.logger.error(__name__ + '>>> query_here()  查询出错！')
+			raise e
 
 if __name__=='__main__':
 	app.run(debug=True, host='0.0.0.0')
