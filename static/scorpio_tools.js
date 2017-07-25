@@ -10,22 +10,53 @@ function query_here(obj) {
 		$("#create_time").text(data.create_time);
 		$("#operator").text(data.operator);
 	});
-    //向模态框中传值  
-    // $('#stuno').val(stuno);  
-    // $('#pass').val(pass);  
-    // $('#stuname').val(name);  
-    // if (sex == '女') {  
-    //     document.getElementById('women').checked = true;  
-    // } else {  
-    //     document.getElementById('man').checked = true;  
-    // }  
-    // $('#update').modal('show');  
 }  
 
-$("#editinfo").on("hidden.bs.modal", function(){
-	$("#editinfo").modal("show");
+function create_new(obj) {
+    $("#createNewForm").submit();
+    // $.post("new", {inputItem:$("#inputItem").val(), inputRemark:$("#inputRemark").val()}, function(data){
+    //     alert("数据: \n" + data + "\n状态: " + status);
+    // }, "json");
+}
+
+//将form转为AJAX提交
+function ajaxSubmit(frm, fn) {
+    var dataPara = getFormJson(frm);
+    $.ajax({
+        url: frm.action,
+        type: frm.method,
+        data: dataPara,
+        success: fn
+    });
+}
+
+//将form中的值转换为键值对。
+function getFormJson(frm) {
+    var o = {};
+    var a = $(frm).serializeArray();
+    $.each(a, function () {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } 
+        else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+}
+
+$(document).ready(function(){
+    $('#createNewForm').bind('submit', function(){
+        ajaxSubmit(this, function(data){
+            alert(data);
+        });
+        return false;
+    });
 })
-		
+
 $("#myModalLabel").on("hidden.bs.modal", function(){
     $("#myModalLabel").modal("show");
 })

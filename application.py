@@ -42,6 +42,7 @@ class MinorPurchase(db.Model):
     	self.create_time = create_time
     	self.modify_time = modify_time
 
+    #转换dict
     def to_dict(self):
     	return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
 
@@ -69,32 +70,40 @@ def index():
 		app.logger.error(__name__ + '>>> index()  查询出错！')
 		raise e
 
-@app.route('/dengji', methods=['GET', 'POST'])
-def dengji():
-	if request.method == 'POST':
-		return redirect(url_for('details'))
-	else:
-		return render_template('dengji.html')
-
-@app.errorhandler(404)
-def not_found(error):
-    return render_template('error.html'), 404
-
 #查询当前采购信息详情
-@app.route('/query/<int:id>', methods=['GET', 'POST'])
+@app.route('/query/<int:id>')
 @as_json
 def query_here(id):
 	__name__ = '查询当前采购信息详情'
+	try:
+		query = MinorPurchase.query.filter_by(id = id).first_or_404()
+		app.logger.info(__name__ + '>>> query_here()  查询成功！')
+		return query.to_dict()
+	except Exception as e:
+		app.logger.error(__name__ + '>>> query_here()  查询出错！')
+		raise e
+
+#新增信息
+@app.route('/new', methods=['GET', 'POST'])
+def new():
+	__name__ = '新增采购信息页面'
 	if request.method == 'POST':
-		pass
+		app.logger.debug(__name__ + 'hello, here.')
+		item = request.form['inputItem']
+		remark = request.form['inputRemark']
+		operator = '神边人'
+		obj = MinorPurchase(None, item, remark, operator, None, None)
+		db.session.add(obj)
+		db.session.commit()
+		app.logger.info(__name__ + '>>> new()  新增采购信息成功！')
+		return 'insert is OK'
 	else:
-		try:
-			query = MinorPurchase.query.filter_by(id = id).first_or_404()
-			app.logger.info(__name__ + '>>> query_here()  查询成功！')
-			return query.to_dict()
-		except Exception as e:
-			app.logger.error(__name__ + '>>> query_here()  查询出错！')
-			raise e
+		app.logger.info(__name__ + '>>> new()  新增采购信息失败！')
+
+#错误404页面
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('error.html'), 404
 
 if __name__=='__main__':
 	app.run(debug=True, host='0.0.0.0')
