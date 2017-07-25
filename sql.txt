@@ -1,4 +1,0 @@
-暂时想到的sql语句
-
-插入语句, timesmap
-INSERT INTO [TABLE(except 'id')] VALUES (ROW[2], ROW[3], null, null...);
