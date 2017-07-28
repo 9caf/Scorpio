@@ -30,7 +30,7 @@ function ajaxSubmit(frm, fn) {
     });
 }
 
-//将form中的值转换为键值对。
+//将form中的值转换为键值对
 function getFormJson(frm) {
     var o = {};
     var a = $(frm).serializeArray();
@@ -55,7 +55,8 @@ $(document).ready(function(){
         });
         return false;
     });
-})
+});
+
 
 $("#myModalLabel").on("hidden.bs.modal", function(){
     $("#myModalLabel").modal("show");
