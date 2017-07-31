@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import '_pagination.html' as p %}
+
+{% block main_title %}
+	零星采购编号申请登记 <br>
+	<small>填写采购信息：</small>
+{% endblock %}
+	
+{% block content %}
+	<form role="form" action="/new" method="post">
+		<div class="form-group">
+			 <label for="item">项目名称（必选）</label><input type="text" class="form-control" id="item" name="item"/>
+			 <label for="operator">经办人（必选）</label><input type="text" class="form-control" id="operator" name="operator"/>
+			 <label for="remark">项目详细说明（可选）</label><textarea class="form-control" rows="5" id="remark" name="remark"/></textarea>
+		</div>		
+		<div class="set-text-right set-margin-20px">
+			<input type="reset" class="btn btn-default" value="重置该信息" />
+			<input type="submit" class="btn btn-success" value="确认提交" />
+		</div>
+	</form>
+{% endblock %}
+
+{% block operate %}
+	<a href="/index" class="btn btn-default btn-block">返回主页面</a>
+	<button type="button" class="btn btn-default btn-block btn-primary" onclick="javascript:history.back(-1);">返回上一页</button>
+{% endblock%}

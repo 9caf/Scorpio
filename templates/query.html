@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% import '_pagination.html' as p %}
+
+{% block main_title %}
+	零星采购编号申请登记 <br>
+	<small>该采购详情如下：</small>
+{% endblock %}
+	
+{% block content %}
+	<table class="table table-hover table-striped">
+		<tr>
+			<td class="info details">
+				<h4><b>零星采购编号</b></h4>
+			</td>
+			<td>
+				{% set number = result.id + result.create_time|datetimeformat('%Y')|int * 10000 %}
+				<h4><b>{{ number }}</b></h4>
+			</td>
+		</tr>
+		<tr>
+			<td class="info details">
+				<b>项目</b>
+			</td>
+			<td>
+				{{ result.item }}
+			</td>
+		</tr>
+		<tr>
+			<td class="info details">
+				<b>经办人</b>
+			</td>
+			<td>
+				{{ result.operator }}
+			</td>
+		</tr>
+		<tr>
+			<td class="info details">
+				<b>创建时间</b>
+			</td>
+			<td>
+				{{ result.create_time }}
+			</td>
+		</tr>
+		<tr>
+			<td class="info details remark">
+				<b>备注</b>
+			</td>
+			<td>
+				{{ result.remark }}
+			</td>
+		</tr>
+	</table>
+{% endblock %}
+
+{% block operate %}
+	<a href="/edit/{{ result.id }}" class="btn btn-info btn-block">编辑该信息</a>
+	<a href="/delete/{{ result.id }}" class="btn btn-danger btn-block">删除该信息</a>
+	<a href="/index" class="btn btn-default btn-block">返回主页面</a>
+	<button type="button" class="btn btn-default btn-block btn-primary" onclick="javascript:history.back(-1);">返回上一页</button>
+{% endblock%}

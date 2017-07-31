@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% import '_pagination.html' as p %}
+
+{% block main_title %}
+	零星采购编号申请登记 <br>
+	{% set number = result.id + result.create_time|datetimeformat('%Y')|int * 10000 %}
+	<small>编号【{{ number }}】采购详情如下：</small>
+{% endblock %}
+	
+{% block content %}
+	<form role="form" action="/edit/{{ result.id }}" method="post">
+		<div class="form-group">
+			 <label for="item">项目名称（必选）</label><input type="text" class="form-control" id="item" name="item" value="{{ result.item }}" />
+			 <label for="operator">经办人（必选）</label><input type="text" class="form-control" id="operator" name="operator" value="{{ result.operator }}" />
+			 <label for="remark">项目详细说明（可选）</label><textarea class="form-control" rows="5" id="remark" name="remark">{{ result.remark }}</textarea>
+			  <input type="hidden" class="form-control" id="pk_id" name="pk_id" value="{{ result.id }}" />
+			 <input type="hidden" class="form-control" id="create_time" name="create_time" value="{{ result.create_time }}" />
+		</div>		
+		<div class="set-text-right set-margin-20px">
+			<input type="reset" class="btn btn-default" value="重置该信息" />
+			<input type="submit" class="btn btn-success" value="确认提交" />
+		</div>
+	</form>
+{% endblock %}
+
+{% block operate %}
+	<a href="/delete/{{ result.id }}" class="btn btn-danger btn-block">删除该信息</a>
+	<a href="/index" class="btn btn-default btn-block">返回主页面</a>
+	<button type="button" class="btn btn-default btn-block btn-primary" onclick="javascript:history.back(-1);">返回上一页</button>
+{% endblock%}

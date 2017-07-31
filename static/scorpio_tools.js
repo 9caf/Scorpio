@@ -51,7 +51,12 @@ function getFormJson(frm) {
 $(document).ready(function(){
     $('#createNewForm').bind('submit', function(){
         ajaxSubmit(this, function(data){
-            alert(data);
+            var number = data.create_time.substr(0,4) * 10000 + data.id * 1;
+            $("#id").text(number);
+            $("#item").text(data.item);
+            $("#remark").text(data.remark);
+            $("#create_time").text(data.create_time);
+            $("#operator").text(data.operator);
         });
         return false;
     });
@@ -61,3 +66,7 @@ $(document).ready(function(){
 $("#myModalLabel").on("hidden.bs.modal", function(){
     $("#myModalLabel").modal("show");
 })
+
+function reflash(){
+    window.location.reload();
+}

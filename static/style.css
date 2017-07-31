@@ -17,3 +17,20 @@
 .operate {
 	width: 15%
 }
+
+.details {
+	width: 30%;
+	text-align: right;
+}
+
+.remark {
+	height: 180px;
+}
+
+.set-text-right {
+	text-align: right;
+}
+
+.set-margin-20px {
+	margin: 20px 0;
+}

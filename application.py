@@ -4,8 +4,7 @@ __author__ = '106035405@qq.com'
 
 from flask import Flask, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
-from flask_json import FlaskJSON, as_json
-import pymysql, json
+import pymysql
 
 #加载flask框架
 app = Flask(__name__)
@@ -15,11 +14,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:330
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 app.logger.debug(db)
-
-#加载flask-json配置
-FlaskJSON(app)
-app.config['JSON_ADD_STATUS'] = False
-app.config['JSON_DATETIME_FORMAT'] = '%Y年%m月%d日'
 
 #定义零星采购的信息属性Model
 class MinorPurchase(db.Model):
@@ -42,10 +36,6 @@ class MinorPurchase(db.Model):
     	self.create_time = create_time
     	self.modify_time = modify_time
 
-    #转换dict
-    def to_dict(self):
-    	return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
-
 #自定义jinja2的日期格式化过滤器
 def datetimeformat(value, format='%Y年%m月%d日'):
 	return value.strftime(format)
@@ -63,24 +53,20 @@ def index():
 		query = pagination.items
 		app.logger.info(__name__ + '>>> index()  查询成功！')
 		return render_template('index.html', result = query, pagination = pagination)
-	except TypeError as e:
-		app.logger.error(__name__ + '运行类型错误  查询出错！')
-		raise e
 	except Exception as e:
-		app.logger.error(__name__ + '>>> index()  查询出错！')
+		app.logger.error(__name__ + '数据库操作错误')
 		raise e
 
 #查询当前采购信息详情
 @app.route('/query/<int:id>')
-@as_json
-def query_here(id):
+def query(id):
 	__name__ = '查询当前采购信息详情'
 	try:
 		query = MinorPurchase.query.filter_by(id = id).first_or_404()
 		app.logger.info(__name__ + '>>> query_here()  查询成功！')
-		return query.to_dict()
+		return render_template('query.html', result = query)
 	except Exception as e:
-		app.logger.error(__name__ + '>>> query_here()  查询出错！')
+		app.logger.error(__name__ + '数据库操作错误')
 		raise e
 
 #新增信息
@@ -89,16 +75,65 @@ def new():
 	__name__ = '新增采购信息页面'
 	if request.method == 'POST':
 		app.logger.debug(__name__ + 'hello, here.')
-		item = request.form['inputItem']
-		remark = request.form['inputRemark']
-		operator = '神边人'
+		item = request.form['item']
+		remark = request.form['remark']
+		operator = request.form['operator']
 		obj = MinorPurchase(None, item, remark, operator, None, None)
-		db.session.add(obj)
-		db.session.commit()
-		app.logger.info(__name__ + '>>> new()  新增采购信息成功！')
-		return 'insert is OK'
+		try:
+			db.session.add(obj)
+			db.session.commit()
+			app.logger.info(__name__ + '>>> new()  新增采购信息成功！')
+			query = MinorPurchase.query.filter_by(operator = operator).order_by(MinorPurchase.id.desc()).first()
+			app.logger.info(__name__ + '>>> query_here()  查询新增信息成功！返回编号')
+			return render_template('query.html', result = query)
+		except Exception as e:
+			app.logger.error(__name__ + '数据库操作错误')
+			raise e
 	else:
-		app.logger.info(__name__ + '>>> new()  新增采购信息失败！')
+		return render_template('new.html')
+
+#编辑信息
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+	__name__ = '编辑采购信息页面'
+	app.logger.debug(__name__ + '看看id等于多少：' + str(id))
+	if request.method == 'POST':
+		app.logger.debug(__name__ + 'hello, here.')
+		obj = MinorPurchase.query.filter_by(id = id).first_or_404()
+		obj.id = request.form['pk_id']
+		obj.item = request.form['item']
+		obj.remark = request.form['remark']
+		obj.operator = request.form['operator']
+		obj.create_time = request.form['create_time']
+		try:
+			db.session.add(obj)
+			db.session.commit()
+			app.logger.info(__name__ + '>>> edit()  修改采购信息成功！')
+			query = MinorPurchase.query.filter_by(id = id).first_or_404()
+			app.logger.info(__name__ + '>>> query_here()  查询新增信息成功！返回采购信息')
+			return render_template('query.html', result = query)
+		except Exception as e:
+			app.logger.error(__name__ + '数据库操作错误')
+			raise e
+	else:
+		app.logger.debug(__name__ + '跑到这里来了')
+		query = MinorPurchase.query.filter_by(id = id).first_or_404()
+		app.logger.info(__name__ + '>>> query_here()  查询成功！')
+		return render_template('edit.html', result = query)
+
+#删除信息
+@app.route('/delete/<int:id>')
+def delete(id):
+	__name__ = '删除采购信息页面'
+	obj = MinorPurchase.query.filter_by(id = id).first_or_404()
+	try:
+		db.session.delete(obj)
+		db.session.commit()
+		app.logger.info(__name__ + '>>> delete()  删除采购信息成功！')
+		return index()
+	except Exception as e:
+		app.logger.error(__name__ + '数据库操作错误')
+		raise e
 
 #错误404页面
 @app.errorhandler(404)
