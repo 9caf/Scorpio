@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import '_pagination.html' as p %}
+
+{% block main_title %}
+	零星采购编号申请登记 <br>
+	<small>请填写查询采购的信息：</small>
+{% endblock %}
+	
+{% block content %}
+	<form role="form" action="/search">
+		<div class="form-group">
+			<label for="item">按项目查询</label><input type="text" name="item" id="item" class="form-control" placeholder="请输入关键字" />
+		</div>		
+		<div class="set-text-right set-margin-20px">
+			<input type="submit" class="btn btn-success" value="确认查询" />
+		</div>
+	</form>
+{% endblock %}
+
+{% block operate %}
+	<a href="/index" class="btn btn-default btn-block">返回主页面</a>
+	<button type="button" class="btn btn-default btn-block btn-primary" onclick="javascript:history.back(-1);">返回上一页</button>
+{% endblock%}

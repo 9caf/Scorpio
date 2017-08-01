@@ -51,7 +51,7 @@
 		</tbody>
 	</table>
 	{% if pagination %}
-		{{ p.pagination_widget(pagination,'index') }}
+		{{ p.pagination_widget(pagination,'queryByElement', item_p) }}
 	{% endif %}
 {% endblock %}
 

@@ -135,6 +135,33 @@ def delete(id):
 		app.logger.error(__name__ + '数据库操作错误')
 		raise e
 
+#按条件查询页面
+@app.route('/query_mode')
+def queryMode():
+	__name__ = '按条件查询页面'
+	app.logger.info(__name__ + '现在走到这里了。')
+	return render_template('query_mode.html')
+
+#按条件查询信息
+@app.route('/search')
+def queryByElement():
+	__name__ = '个别查询采购信息页面'
+	app.logger.debug(__name__ + 'hello, here.')
+	item = request.args.get('item', '')
+	words = '%' + item + '%'
+	app.logger.debug(__name__ + 'words = ' + words)
+
+	page = request.args.get('page', 1, type = int)
+	pagination = MinorPurchase.query.filter(MinorPurchase.item.like(words)).order_by(MinorPurchase.id.desc()).paginate(
+		page, per_page=10, error_out=True
+	)
+	query = pagination.items
+	if query:
+		app.logger.info(__name__ + '>>> queryByElement()  查询成功！')
+		return render_template('index_result.html', result = query, pagination = pagination, item_p = '&item=' + item)
+	else:
+		return render_template('error.html'), 404
+
 #错误404页面
 @app.errorhandler(404)
 def not_found(error):
