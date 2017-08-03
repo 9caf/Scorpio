@@ -4,6 +4,9 @@ __author__ = '106035405@qq.com'
 
 from flask import Flask, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+# from flask_login import LoginManager, login_required
+# from forms import LoginForm
+import flask_excel as excel
 import pymysql
 
 #加载flask框架
@@ -43,6 +46,7 @@ app.jinja_env.filters['datetimeformat'] = datetimeformat
 
 #登入第一个页面
 @app.route('/index')
+# @login_required
 def index():
 	__name__ = '登入查询第一个页面'
 	try:
@@ -167,5 +171,63 @@ def queryByElement():
 def not_found(error):
     return render_template('error.html'), 404
 
+# class User(db.Model):
+# 	__tablename__ = 't_users'
+# 	 # 表的结构:
+# 	id = db.Column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
+# 	username = db.Column(db.String)
+# 	password = db.Column(db.String)
+
+# 	def __init__(self, id, username, password):
+# 		self.id = id
+# 		self.username = username
+# 		self.password = password
+
+# 	def is_authenticated():
+# 		if isinstance(self, AnonymousUserMixin):
+# 			return False
+# 		else:
+# 			return True
+
+# # 测试一下用户管理
+# login_manager = LoginManager()
+# login_manager.init_app(app)
+
+# login_manager.login_view = "login"
+# # login_manager.session_protection = "strong"
+# # login_manager.login_message = "Please login to access this page."
+# # login_manager.login_message_category = "info"
+
+# @login_manager.user_loader
+# def load_user(userid):
+# 	return User.get(userid)
+
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     # Here we use a class of some kind to represent and validate our
+#     # client-side form data. For example, WTForms is a library that will
+#     # handle this for us, and we use a custom LoginForm to validate.
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         # Login and validate the user.
+#         # user should be an instance of your `User` class
+#         login_user(user)
+
+#         flask.flash('Logged in successfully.')
+
+#         next = flask.request.args.get('next')
+#         # next_is_valid should check if the user has valid
+#         # permission to access the `next` url
+#         if not next_is_valid(next):
+#             return flask.abort(400)
+
+#         return flask.redirect(next or flask.url_for('index'))
+#     return flask.render_template('login.html', form=form)
+
+@app.route("/export", methods=['GET'])
+def export():
+    return excel.make_response_from_tables(db.session, [MinorPurchase], "xlsx")
+
 if __name__=='__main__':
+	excel.init_excel(app)
 	app.run(debug=True, host='0.0.0.0')
